@@ -215,6 +215,23 @@ open LLM backend (not only Azure OpenAI):
 Patterns adapted from the [AI-Gateway](https://github.com/Azure-Samples/AI-Gateway)
 labs (Bicep → Terraform, Azure OpenAI → self-hosted / open LLMs).
 
+## Observe & operate the gateway (optional)
+
+The **[AI Gateway Dev Portal](https://github.com/Azure-Samples/ai-gateway-dev-portal)**
+(Azure-Samples) is a React dashboard for *any* APIM AI gateway — **no code from
+this repo required**. Point it at this deployment to watch the policies work in
+real time:
+
+```bash
+npx github:Azure-Samples/ai-gateway-dev-portal   # opens http://localhost:5173
+```
+
+Sign in with your Azure account (or paste a token from `az account get-access-token`),
+then pick your **subscription → APIM instance → workspace**. For this deployment
+you'll see the **gpt-oss** and **embeddings** inference APIs, the PoC subscription,
+and dashboards for **tokens, latency, availability, and Logs** — fed by the
+Application Insights + Log Analytics that `00-infra` provisions.
+
 ## Credits
 
 Policy patterns are adapted from Microsoft's AI-gateway samples — we borrow
@@ -225,8 +242,7 @@ patterns, we don't fork:
   Models" policy patterns (its labs use Azure OpenAI; here we target self-hosted /
   open LLMs).
 - **[Azure-Samples/ai-gateway-dev-portal](https://github.com/Azure-Samples/ai-gateway-dev-portal)**
-  — optional React dashboard (Static Web App) to visualise/operate any APIM AI
-  gateway. Provider-agnostic; point it at your APIM. Run: `npx github:Azure-Samples/ai-gateway-dev-portal`.
+  — the operations dashboard used above.
 
 ## What's included
 
