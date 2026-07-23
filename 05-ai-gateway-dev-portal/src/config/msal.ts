@@ -8,7 +8,9 @@ export const msalConfig: Configuration = {
     clientId: customClientId || (import.meta.env.VITE_AZURE_CLIENT_ID ?? ''),
     authority: customTenant
       ? `https://login.microsoftonline.com/${customTenant}`
-      : 'https://login.microsoftonline.com/organizations',
+      : import.meta.env.VITE_AZURE_TENANT_ID
+        ? `https://login.microsoftonline.com/${import.meta.env.VITE_AZURE_TENANT_ID}`
+        : 'https://login.microsoftonline.com/organizations',
     redirectUri: window.location.origin,
     postLogoutRedirectUri: window.location.origin,
   },

@@ -51,11 +51,16 @@ az ad app permission add --id "$CLIENT_ID" \
 
 ## 2. Build
 
-Vite inlines `VITE_AZURE_CLIENT_ID` at build time:
+Vite inlines these at build time. `VITE_AZURE_TENANT_ID` points MSAL at the
+directory where the app registration and your APIM live — required for
+single-tenant apps and for guest accounts (otherwise sign-in routes to the
+user's home tenant and fails with `AADSTS700016`).
 
 ```bash
+TENANT_ID=$(az account show --query tenantId -o tsv)
+
 npm install
-VITE_AZURE_CLIENT_ID=$CLIENT_ID npm run build   # -> dist/
+VITE_AZURE_CLIENT_ID=$CLIENT_ID VITE_AZURE_TENANT_ID=$TENANT_ID npm run build   # -> dist/
 ```
 
 ## 3. Create + deploy the Static Web App
@@ -93,7 +98,7 @@ flows through the gateway.
 ## Re-deploy after changes
 
 ```bash
-VITE_AZURE_CLIENT_ID=$CLIENT_ID npm run build
+VITE_AZURE_CLIENT_ID=$CLIENT_ID VITE_AZURE_TENANT_ID=$TENANT_ID npm run build
 TOKEN=$(az staticwebapp secrets list -n "$SWA" -g "$RG" --query properties.apiKey -o tsv)
 npx -y @azure/static-web-apps-cli deploy ./dist --deployment-token "$TOKEN" --env production
 ```
