@@ -105,6 +105,7 @@ Deterministic retrieve-then-generate — doesn't depend on model tool-calling.
 | [`02-apim/`](02-apim/) | AI-gateway config — LLM + Embeddings APIs, backends, policies |
 | [`03-app/`](03-app/) | RAG agent — MAF + Azure AI Search, FastAPI |
 | [`04-load-tests/`](04-load-tests/) | k6 baseline (same script for backend & gateway) |
+| [`05-ai-gateway-dev-portal/`](05-ai-gateway-dev-portal/) | Operations UI — the Azure-Samples AI Gateway Dev Portal (React), vendored to run/deploy against this gateway |
 
 ## Prerequisites
 
@@ -217,20 +218,24 @@ labs (Bicep → Terraform, Azure OpenAI → self-hosted / open LLMs).
 
 ## Observe & operate the gateway (optional)
 
-The **[AI Gateway Dev Portal](https://github.com/Azure-Samples/ai-gateway-dev-portal)**
-(Azure-Samples) is a React dashboard for *any* APIM AI gateway — **no code from
-this repo required**. Point it at this deployment to watch the policies work in
-real time:
+[`05-ai-gateway-dev-portal/`](05-ai-gateway-dev-portal/) vendors the
+**[AI Gateway Dev Portal](https://github.com/Azure-Samples/ai-gateway-dev-portal)**
+(Azure-Samples, MIT) — a React dashboard for *any* APIM AI gateway. It's the
+companion to the load tests: k6 drives load, the portal shows it live.
+
+Run it against this deployment:
 
 ```bash
-npx github:Azure-Samples/ai-gateway-dev-portal   # opens http://localhost:5173
+cd 05-ai-gateway-dev-portal
+npm install && npm run dev        # http://localhost:5173
 ```
 
 Sign in with your Azure account (or paste a token from `az account get-access-token`),
-then pick your **subscription → APIM instance → workspace**. For this deployment
-you'll see the **gpt-oss** and **embeddings** inference APIs, the PoC subscription,
-and dashboards for **tokens, latency, availability, and Logs** — fed by the
-Application Insights + Log Analytics that `00-infra` provisions.
+then pick your **subscription → APIM instance → workspace**. You'll see the
+**gpt-oss** and **embeddings** inference APIs, the PoC subscription, and dashboards
+for **tokens, latency, availability, and Logs** — fed by the Application Insights +
+Log Analytics that `00-infra` provisions. Deploy it as an Azure Static Web App
+using the included `deploy.ps1` (see the folder's own README).
 
 ## Credits
 

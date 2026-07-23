@@ -21,7 +21,9 @@ tfplan
 # Internal / customer-specific material — do NOT publish to a public repo
 context.md
 **/libraryIQ_*
-.github/
+# Only the repo-root .github (our internal Copilot config); nested .github
+# (e.g. the vendored dev portal's) is kept.
+/.github/
 
 # Load-test results (dir kept) + the xk6-built k6 binary
 04-load-tests/results/*
