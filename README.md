@@ -105,7 +105,6 @@ Deterministic retrieve-then-generate — doesn't depend on model tool-calling.
 | [`02-apim/`](02-apim/) | AI-gateway config — LLM + Embeddings APIs, backends, policies |
 | [`03-app/`](03-app/) | RAG agent — MAF + Azure AI Search, FastAPI |
 | [`04-load-tests/`](04-load-tests/) | k6 baseline (same script for backend & gateway) |
-| `references/` | Cloned upstream samples (gitignored, read-only — see below) |
 
 ## Prerequisites
 
@@ -216,9 +215,10 @@ open LLM backend (not only Azure OpenAI):
 Patterns adapted from the [AI-Gateway](https://github.com/Azure-Samples/AI-Gateway)
 labs (Bicep → Terraform, Azure OpenAI → self-hosted / open LLMs).
 
-## References (read-only, not part of this repo)
+## Credits
 
-Cloned into `references/` (gitignored). We **borrow patterns**, we don't fork:
+Policy patterns are adapted from Microsoft's AI-gateway samples — we borrow
+patterns, we don't fork:
 
 - **[Azure-Samples/AI-Gateway](https://github.com/Azure-Samples/AI-Gateway)** —
   lab cookbook (notebooks + Bicep + policy XML). Source of the "AI Gateway for
@@ -226,8 +226,7 @@ Cloned into `references/` (gitignored). We **borrow patterns**, we don't fork:
   open LLMs).
 - **[Azure-Samples/ai-gateway-dev-portal](https://github.com/Azure-Samples/ai-gateway-dev-portal)**
   — optional React dashboard (Static Web App) to visualise/operate any APIM AI
-  gateway. Provider-agnostic; point it at our APIM once the gateway surface
-  exists. Run locally: `npx github:Azure-Samples/ai-gateway-dev-portal`.
+  gateway. Provider-agnostic; point it at your APIM. Run: `npx github:Azure-Samples/ai-gateway-dev-portal`.
 
 ## What's included
 
