@@ -1,0 +1,58 @@
+<!--
+  gpt-oss chat API policy (RENDERED from gpt-oss-api.xml.tftpl by Terraform).
+
+  Full AI-gateway chain (elements included conditionally by Terraform flags):
+    inbound:
+      - llm-content-safety        (when enable_content_safety)  -> 403 on violation
+      - llm-semantic-cache-lookup (when enable_semantic_cache + embeddings set)
+        + rate-limit              (protects backend if the cache is unavailable)
+      - llm-token-limit           quota below the Phase-1 ceiling -> 429
+      - llm-emit-token-metric     per-consumer token telemetry -> App Insights
+      - set-backend-service       -> gpt-oss primary, or the priority pool (failover)
+    outbound:
+      - llm-semantic-cache-store  (when semantic cache enabled)
+
+  Backend auth (tunnel token / model API key) is set on the backend ENTITY
+  (credentials), so it applies to the main call AND the cache's embeddings
+  side-call — no set-header needed here.
+-->
+<policies>
+  <inbound>
+    <base />
+%{ if content_safety_enabled ~}
+    <llm-content-safety backend-id="${content_safety_backend_id}" shield-prompt="true">
+      <categories output-type="EightSeverityLevels">
+        <category name="Hate" threshold="4" />
+        <category name="Violence" threshold="4" />
+        <category name="Sexual" threshold="4" />
+        <category name="SelfHarm" threshold="4" />
+      </categories>
+    </llm-content-safety>
+%{ endif ~}
+%{ if cache_enabled ~}
+    <llm-semantic-cache-lookup score-threshold="0.05" embeddings-backend-id="${cache_embeddings_backend_id}" ignore-system-messages="true" max-message-count="10">
+      <vary-by>@(context.Subscription.Id)</vary-by>
+    </llm-semantic-cache-lookup>
+    <rate-limit calls="10" renewal-period="60" />
+%{ endif ~}
+    <llm-token-limit counter-key="${counter_key}" tokens-per-minute="${tokens_per_minute}" estimate-prompt-tokens="false" retry-after-header-name="Retry-After" remaining-tokens-header-name="x-remaining-tokens" />
+    <llm-emit-token-metric namespace="llm-metrics">
+      <dimension name="API ID" value="@(context.Api.Id)" />
+      <dimension name="Subscription ID" value="@(context.Subscription.Id)" />
+      <dimension name="Client IP" value="@(context.Request.IpAddress)" />
+    </llm-emit-token-metric>
+    <set-backend-service backend-id="${backend_id}" />
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+%{ if cache_enabled ~}
+    <llm-semantic-cache-store duration="60" />
+%{ endif ~}
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

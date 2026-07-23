@@ -1,0 +1,43 @@
+# Local env / secrets
+.env
+*.local
+
+# Terraform — state, provider caches, and tfvars (never commit these).
+# State + tfvars carry keys, connection strings, and the publisher email.
+**/.terraform/
+**/.terraform.lock.hcl
+*.tfstate
+*.tfstate.*
+*.tfvars
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+tfplan
+*.tfplan
+*.log
+
+# Internal / customer-specific material — do NOT publish to a public repo
+context.md
+**/libraryIQ_*
+.github/
+
+# Load-test results (dir kept) + the xk6-built k6 binary
+04-load-tests/results/*
+!04-load-tests/results/.gitkeep
+k6
+
+# Cloned reference repos + the customer plan doc (not part of the public source)
+references/
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# OS / editor cruft
+.DS_Store

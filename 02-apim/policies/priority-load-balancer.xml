@@ -1,0 +1,38 @@
+<!--
+  PLACEHOLDER — priority-load-balancer policy
+
+  Intent: route across a pool of backends with priority + weight so that when
+  the primary gpt-oss deployment is at capacity or its circuit breaker is open,
+  traffic fails over to lower-priority backend(s) instead of erroring.
+
+  Design decisions still to confirm before implementing:
+    - Pool membership: primary gpt-oss pool vs. secondary (e.g. spillover
+      deployment or a smaller model) — what are the real failover targets?
+    - Mechanism: APIM Backend Pool (type: pool) with priority + weight, defined
+      via azurerm_api_management_backend (pool) resources and selected with
+      set-backend-service in policy.
+    - Interaction with circuit-breaker: LB should skip backends whose breaker
+      is open.
+    - Session affinity: none for stateless completions (confirm).
+
+  NOTE: like the circuit breaker, the load-balanced pool is defined on backend
+  resources. This XML stub is the policy hook that selects the pool.
+
+  Reference (do NOT treat as final):
+    <set-backend-service backend-id="gpt-oss-pool" />
+-->
+<policies>
+  <inbound>
+    <base />
+    <!-- select load-balanced backend pool here -->
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

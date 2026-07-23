@@ -1,0 +1,33 @@
+<!--
+  PLACEHOLDER — llm-token-limit policy
+
+  Intent: enforce token-based quota / rate limiting so that when a client (or
+  the aggregate) exceeds its allotted tokens-per-minute against the gpt-oss
+  backend, requests are throttled (429) rather than piling onto the H100 pool.
+
+  Design decisions still to confirm before implementing:
+    - Scope: per subscription key / per product / global
+    - Limits: tokens-per-minute, and whether to also cap concurrent requests
+    - Token counting: use <azure-openai-token-limit> / <llm-token-limit> policy
+      (estimate-prompt-tokens) vs. header-based
+    - 429 behaviour: Retry-After header, custom error body
+
+  Reference policy (do NOT treat as final):
+    <llm-token-limit counter-key="@(context.Subscription.Id)"
+                     tokens-per-minute="..." estimate-prompt-tokens="true" />
+-->
+<policies>
+  <inbound>
+    <base />
+    <!-- token-limit policy goes here -->
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

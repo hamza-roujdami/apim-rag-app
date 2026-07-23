@@ -1,0 +1,25 @@
+# Copy to terraform.tfvars and fill in. terraform.tfvars is gitignored.
+
+name_prefix         = "apimragpoc"
+location            = "swedencentral"
+resource_group_name = "rg-apim-rag-poc"
+
+publisher_email = "you@example.com"
+publisher_name  = "APIM RAG PoC"
+
+# StandardV2_1 = StandardV2 tier, 1 unit. Bump the unit count for load tests.
+sku_name = "StandardV2_1"
+
+# Observability
+log_retention_days = 30
+
+# Networking — leave false in the sandbox (mock/local backend). Set true in the
+# customer subscription where APIM needs VNet integration to the private backend.
+enable_vnet        = false
+vnet_address_space = ["10.10.0.0/16"]
+apim_subnet_prefix = "10.10.1.0/24"
+
+tags = {
+  project = "apim-rag-poc"
+  purpose = "ai-gateway-load-test"
+}

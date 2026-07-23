@@ -1,0 +1,46 @@
+<!--
+  PLACEHOLDER — llm-content-safety policy
+
+  Intent: moderate incoming prompts (and optionally completions) through the
+  Azure AI Content Safety service BEFORE they reach gpt-oss. Blocks harmful
+  content (Hate / Violence / Sexual / SelfHarm above a severity threshold) and,
+  with shield-prompt, defends against jailbreak / prompt-injection attacks.
+  On a violation, APIM returns 403 and the request never touches the H100 pool.
+
+  Requires (provisioned in main.tf when enable_content_safety = true):
+    - an Azure AI Content Safety account (module.content_safety)
+    - an APIM backend "content-safety-backend" routing to that account
+    - APIM's managed identity granted "Cognitive Services User" on the account
+
+  Design decisions still to confirm before implementing:
+    - Which categories + severity thresholds match the customer's policy
+    - Whether to also check completions (outbound) or prompts only (inbound)
+    - Custom blocklists (blocklist ids from the Content Safety resource)
+
+  Reference (do NOT treat as final):
+    https://learn.microsoft.com/azure/api-management/llm-content-safety-policy
+-->
+<policies>
+  <inbound>
+    <base />
+    <!--
+    <llm-content-safety backend-id="content-safety-backend" shield-prompt="true">
+      <categories output-type="EightSeverityLevels">
+        <category name="Hate" threshold="4" />
+        <category name="Violence" threshold="4" />
+        <category name="Sexual" threshold="4" />
+        <category name="SelfHarm" threshold="4" />
+      </categories>
+    </llm-content-safety>
+    -->
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

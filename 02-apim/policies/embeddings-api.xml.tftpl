@@ -1,0 +1,29 @@
+<!--
+  Embeddings API policy (RENDERED from embeddings-api.xml.tftpl by Terraform).
+
+  The RAG app calls this on EVERY user query (retrieval), so it's a hot,
+  single-GPU path that saturates before gpt-oss — hence its own token limit.
+    - llm-token-limit        : own TPM quota -> 429
+    - llm-emit-token-metric  : token telemetry -> App Insights
+    - set-backend-service    : route to the Qwen embeddings backend
+-->
+<policies>
+  <inbound>
+    <base />
+    <llm-token-limit counter-key="${counter_key}" tokens-per-minute="${tokens_per_minute}" estimate-prompt-tokens="false" retry-after-header-name="Retry-After" />
+    <llm-emit-token-metric namespace="llm-metrics">
+      <dimension name="API ID" value="@(context.Api.Id)" />
+      <dimension name="Subscription ID" value="@(context.Subscription.Id)" />
+    </llm-emit-token-metric>
+    <set-backend-service backend-id="embeddings" />
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>

@@ -1,0 +1,38 @@
+<!--
+  PLACEHOLDER — circuit-breaker policy
+
+  Intent: stop hammering a saturated / unhealthy gpt-oss backend. When the
+  backend returns sustained 5xx / 429 / timeouts, trip the breaker so APIM
+  fails fast (or fails over) instead of letting requests queue and degrade the
+  inference tier further.
+
+  Design decisions still to confirm before implementing:
+    - Mechanism: APIM Backend circuitBreaker rules (failureCondition:
+      statusCodeRanges, count, interval, tripDuration) vs. policy-expression
+      based. Backend-level circuit breaker is preferred and is defined on the
+      azurerm_api_management_backend resource (circuit_breaker block), not
+      purely in XML.
+    - Trip thresholds: error count / percentage over interval, trip duration
+    - Behaviour while tripped: return 503 with Retry-After, or hand off to the
+      priority-load-balancer for failover to a secondary backend
+
+  NOTE: the circuit breaker is largely configured on the *backend* resource.
+  This XML stub is a placeholder for any accompanying inbound/on-error handling
+  (e.g. shaping the response when the breaker is open).
+-->
+<policies>
+  <inbound>
+    <base />
+  </inbound>
+  <backend>
+    <base />
+    <!-- backend routing honours circuit-breaker config on the backend resource -->
+  </backend>
+  <outbound>
+    <base />
+  </outbound>
+  <on-error>
+    <base />
+    <!-- shape 503 / Retry-After when the breaker is open -->
+  </on-error>
+</policies>

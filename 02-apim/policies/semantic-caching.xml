@@ -1,0 +1,56 @@
+<!--
+  PLACEHOLDER — semantic caching (llm-semantic-cache-lookup + -store)
+
+  Intent: return a cached completion when an incoming prompt is semantically
+  similar (vector proximity >= score-threshold) to a previous one, instead of
+  calling gpt-oss again. This cuts token load and latency on the H100 pool for
+  repeated / near-duplicate questions — directly helping the capacity goal.
+
+  How it works (two policy elements in one API policy document):
+    - inbound  : llm-semantic-cache-lookup  -> checks the external cache
+    - outbound : llm-semantic-cache-store   -> saves the completion for reuse
+
+  Requires (provisioned in main.tf when enable_semantic_cache = true):
+    - an external cache: Azure Managed Redis (module.redis), registered on APIM
+      via azurerm_api_management_redis_cache (Phase 2 wiring)
+    - an embeddings backend "embeddings-backend" (the customer's Qwen embeddings
+      endpoint, var.embeddings_backend_url) to vectorize the prompt
+    - a rate-limit AFTER the lookup so a cache outage can't flood gpt-oss
+
+  Caution (from Microsoft docs): semantic caching returns responses by
+  similarity, not exact match — it can surface stale/incorrect answers. Keep
+  score-threshold low (start ~0.05) and pair with content safety.
+
+  Design decisions still to confirm before implementing:
+    - score-threshold tuned to the customer's prompt distribution
+    - cache TTL (duration) and vary-by scope (per subscription / user / team)
+
+  Reference (do NOT treat as final):
+    https://learn.microsoft.com/azure/api-management/azure-openai-enable-semantic-caching
+-->
+<policies>
+  <inbound>
+    <base />
+    <!--
+    <llm-semantic-cache-lookup
+        score-threshold="0.05"
+        embeddings-backend-id="embeddings-backend"
+        embeddings-backend-auth="system-assigned"
+        ignore-system-messages="true"
+        max-message-count="10">
+      <vary-by>@(context.Subscription.Id)</vary-by>
+    </llm-semantic-cache-lookup>
+    <rate-limit calls="10" renewal-period="60" />
+    -->
+  </inbound>
+  <backend>
+    <base />
+  </backend>
+  <outbound>
+    <base />
+    <!-- <llm-semantic-cache-store duration="60" /> -->
+  </outbound>
+  <on-error>
+    <base />
+  </on-error>
+</policies>
